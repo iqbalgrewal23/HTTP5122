@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electronic Logbook</title>
+</head>
+<body>
+    <p id='driveTime'>Driving Time Left: 13h 0m 0s</p>
+    <p id='breakTime'>Break Time: 0m 0s</p>
+    <button onclick='startDriving()'>Drive</button>
+    <button onclick='startBreak()'>Break</button>
+    <button onclick='endShift()'>End Shift</button>
+
+    <script>
+        let driverName = prompt("Enter your name:");
+        let tractorPlate = prompt("Enter tractor license plate:");
+        let trailerPlate = prompt("Enter trailer license plate:");
+
+        let driveTimer = 13 * 60 * 60; // 13 hours in seconds
+        let breakTimer = 0;
+        let shiftStartTime = new Date();
+        let breakTimes = [];
+        let drivingInterval, breakInterval;
+
+        function startDriving() {
+            clearInterval(breakInterval);
+            if (!drivingInterval) {
+                drivingInterval = setInterval(() => {
+                    if (driveTimer > 0) {
+                        driveTimer--;
+                        updateDisplay();
+                    } else {
+                        clearInterval(drivingInterval);
+                        alert("Driving time ended!");
+                    }
+                }, 1000);
+            }
+        }
+
+        function startBreak() {
+            clearInterval(drivingInterval);
+            drivingInterval = null;
+            if (!breakInterval) {
+                let breakStart = new Date();
+                breakTimes.push(breakStart.toLocaleTimeString());
+                breakInterval = setInterval(() => {
+                    breakTimer++;
+                    updateDisplay();
+                }, 1000);
+            }
+        }
+
+        function endShift() {
+            clearInterval(drivingInterval);
+            clearInterval(breakInterval);
+            let shiftEndTime = new Date();
+            let workedHours = (13 * 60 * 60 - driveTimer) / 3600;
+            
+            alert(`Shift Summary:\nDriver: ${driverName}\nTractor: ${tractorPlate}\nTrailer: ${trailerPlate}\nStart Time: ${shiftStartTime.toLocaleTimeString()}\nBreak Times: ${breakTimes.join(", ")}\nTotal Worked Hours: ${workedHours.toFixed(2)}`);
+        }
+
+        function updateDisplay() {
+            document.getElementById("driveTime").innerText = `Driving Time Left: ${Math.floor(driveTimer / 3600)}h ${Math.floor((driveTimer % 3600) / 60)}m ${driveTimer % 60}s`;
+            document.getElementById("breakTime").innerText = `Break Time: ${Math.floor(breakTimer / 60)}m ${breakTimer % 60}s`;
+        }
+    </script>
+</body>
+</html>
